@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Browser {
 
-    WebDriver driver;
+    ChromeDriver driver;
 
     public WebDriver getDriver() {
         if (driver == null) {
@@ -38,7 +38,7 @@ public class Browser {
     }
 
     public void openURL(String URL) {
-        driver.get(URL);
+        getDriver().get(URL);
 
     }
 
