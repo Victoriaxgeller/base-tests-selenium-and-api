@@ -30,59 +30,17 @@ public class RegistrationMockTest {
 
     @Test
     public void test() throws InterruptedException, URISyntaxException {
-        openTestResource();
+        browser = new Browser();
         initMock();
+        openTestResource();
         fillFields();
     }
 
     @Test
     public void test2() {
-        createResponseSecondTry();
         fillFields();
     }
 
-
-
-    private void createResponseSecondTry() {
-        browser = new Browser();
-        DevTools devTools = ((HasDevTools) browser.getDriver()).getDevTools();
-        devTools.createSession();
-        devTools.send(Fetch.enable(Optional.empty(), Optional.empty()));
-
-        devTools.addListener(Fetch.requestPaused(), requestConsumer ->
-        {
-            Request request = requestConsumer.getRequest();
-            String currentRequestUrl = request.getUrl();
-
-            if (currentRequestUrl.contains("wp-json/zap/api")) {
-
-                String updateUrl = currentRequestUrl.replace("wp-json/zap/api", "seleznova-test");
-
-                System.out.println("IF BLOCK");
-                devTools.send(Fetch.continueRequest(
-                        requestConsumer.getRequestId(),
-                        Optional.of(updateUrl),
-                        Optional.of(request.getMethod()),
-                        request.getPostData(),
-                        requestConsumer.getResponseHeaders(),
-                        Optional.of(Boolean.valueOf(true))));
-
-            } else {
-                System.out.println("ELSE BLOCK");
-
-                devTools.send(Fetch.continueRequest(
-                        requestConsumer.getRequestId(),
-                        Optional.of(currentRequestUrl.replace("wp-json/zap/api", "seleznova-test")),
-                        Optional.of(request.getMethod()),
-                        request.getPostData(),
-                        requestConsumer.getResponseHeaders(),
-                        Optional.of(Boolean.valueOf(true))));
-            }
-        });
-
-        browser.openURL("https://www.zaptest.com/registration");
-
-    }
 
     private void fillFields() {
         Faker faker = new Faker();
@@ -94,15 +52,14 @@ public class RegistrationMockTest {
     }
 
     private void openTestResource() {
-        browser = new Browser();
         browser.openURL("https://www.zaptest.com/registration");
     }
 
     private void initMock() throws URISyntaxException {
         MockService mockService = new MockService(browser.getDriver());
-//        mockService.addMock(String.valueOf(new URI("https://www.zaptest.com/registration/wp-json/zap/api")), "{\"status\":0,\"error\":\"E-Mail is already registered, confirmation email was resent...\"}");
-        mockService.addMock(String.valueOf(new URI("wp-json/zap/api")), "{\"status\":1,\"msg\":\"preregistered\"}");
-        System.out.println(mockService);
+//        mockService.addMock(String.valueOf(new URI("https://www.zaptest.com/index.php?option=com_zapauth")), "{\"status\":0,\"error\":\"Mocked\"}");
+//        mockService.addMock(String.valueOf(new URI("wp-json/zap/api")), "{\"status\":0,\"error\":\"Request mocked\"}");
+//        System.out.println(mockService);
     }
 
     private void createResponseFirstTry() {

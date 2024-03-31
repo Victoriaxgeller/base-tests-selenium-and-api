@@ -32,23 +32,19 @@ public class MockService {
     // Constructor to initialize DevTools and interceptor for the provided WebDriver
     public MockService(WebDriver driver) {
         devTools.set(((HasDevTools) driver).getDevTools());
-        devTools.get().createSession();
+        devTools.get().createSessionIfThereIsNotOne();
         devTools.get().send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()));
         interceptor.set(new NetworkInterceptor(driver, createRoute()));
     }
 
     // Create a route that intercepts the request if its URI contains a key from mockResponses
     private Route createRoute() {
-        return Route.matching(req -> containsKey(req.getUri())).to(() -> req -> {
-            String responseContent = getResponse(req.getUri());
-            if (responseContent != null) {
+        return Route.matching(req -> req.getUri().contains("index.php?option=com_zapauth")).to(() -> req -> {
+            System.out.println(req.getUri());
                 return new HttpResponse()
                         .setStatus(200)
-                        .addHeader("Content-Type", "application/json")
-                        .setContent(utf8String(responseContent));
-            } else {
-                return null;
-            }
+//                        .addHeader("Content-Type", "application/json")
+                        .setContent(utf8String("{\"status\":1,\"msg\":\"preregistered\"}"));
         });
     }
 
